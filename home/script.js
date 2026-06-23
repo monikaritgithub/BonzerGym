@@ -1,14 +1,16 @@
 /**
  * BONZER GYM - HOMEPAGE SPECIFIC JS
- * Handles page-specific components like the community gallery filtering.
+ * Handles gallery multi-category filtering and reviews auto-carousel.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
   initGalleryFilter();
+  initReviewsCarousel();
 });
 
 /**
  * Handles group session gallery filtering by category tabs
+ * Supports items with multiple space-separated categories (e.g. data-category="gym facility")
  */
 function initGalleryFilter() {
   const filterButtons = document.querySelectorAll('.filter-btn');
@@ -18,34 +20,75 @@ function initGalleryFilter() {
 
   filterButtons.forEach(button => {
     button.addEventListener('click', () => {
-      // Remove active class from all buttons
       filterButtons.forEach(btn => btn.classList.remove('active'));
-      
-      // Add active class to clicked button
       button.classList.add('active');
-      
+
       const filterValue = button.getAttribute('data-filter');
-      
+
       galleryItems.forEach(item => {
-        const itemCategory = item.getAttribute('data-category');
-        
-        if (filterValue === 'all' || itemCategory === filterValue) {
-          // Show item
+        const itemCategory = item.getAttribute('data-category') || '';
+        const matches = filterValue === 'all' || itemCategory.split(' ').includes(filterValue);
+
+        if (matches) {
           item.style.display = 'block';
-          // Force reflow and add animation class if needed
           setTimeout(() => {
             item.style.opacity = '1';
             item.style.transform = 'scale(1)';
-          }, 50);
+          }, 30);
         } else {
-          // Hide item with transition
           item.style.opacity = '0';
-          item.style.transform = 'scale(0.8)';
-          setTimeout(() => {
-            item.style.display = 'none';
-          }, 300); // match transition duration
+          item.style.transform = 'scale(0.92)';
+          setTimeout(() => { item.style.display = 'none'; }, 280);
         }
       });
     });
   });
+}
+
+/**
+ * Reviews auto-scrolling carousel
+ */
+function initReviewsCarousel() {
+  const track = document.getElementById('reviewsTrack');
+  const prevBtn = document.getElementById('reviewsPrev');
+  const nextBtn = document.getElementById('reviewsNext');
+
+  if (!track) return;
+
+  let autoScrollInterval;
+  const scrollAmount = () => {
+    const card = track.querySelector('.review-card');
+    if (!card) return 320;
+    return card.offsetWidth + 24; // card width + gap
+  };
+
+  function scrollNext() {
+    const maxScroll = track.scrollWidth - track.clientWidth;
+    if (track.scrollLeft >= maxScroll - 10) {
+      track.scrollTo({ left: 0, behavior: 'smooth' });
+    } else {
+      track.scrollBy({ left: scrollAmount(), behavior: 'smooth' });
+    }
+  }
+
+  function scrollPrev() {
+    if (track.scrollLeft <= 10) {
+      track.scrollTo({ left: track.scrollWidth, behavior: 'smooth' });
+    } else {
+      track.scrollBy({ left: -scrollAmount(), behavior: 'smooth' });
+    }
+  }
+
+  if (nextBtn) nextBtn.addEventListener('click', () => { clearInterval(autoScrollInterval); scrollNext(); startAuto(); });
+  if (prevBtn) prevBtn.addEventListener('click', () => { clearInterval(autoScrollInterval); scrollPrev(); startAuto(); });
+
+  function startAuto() {
+    autoScrollInterval = setInterval(scrollNext, 4000);
+  }
+
+  startAuto();
+
+  // Pause on hover
+  track.addEventListener('mouseenter', () => clearInterval(autoScrollInterval));
+  track.addEventListener('mouseleave', startAuto);
 }

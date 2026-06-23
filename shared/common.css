@@ -66,6 +66,20 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  padding-top: 80px; /* offset fixed navbar globally */
+}
+
+/* Logo Image */
+.logo-img {
+  height: 46px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+  transition: var(--transition);
+}
+
+.logo-img:hover {
+  opacity: 0.85;
 }
 
 img {
@@ -444,10 +458,6 @@ section {
 @media (max-width: 768px) {
   html {
     font-size: 15px;
-  }
-
-  body {
-    padding-top: 80px; /* offset navbar */
   }
 
   section {

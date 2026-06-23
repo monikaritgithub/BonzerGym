@@ -3,9 +3,9 @@
    ========================================================================== */
 
 .plans-header {
-  padding-top: var(--space-xl);
+  padding-top: 2rem;
+  margin-top: 0;
   text-align: center;
-  margin-top: 40px;
 }
 
 .plans-header h1 {
